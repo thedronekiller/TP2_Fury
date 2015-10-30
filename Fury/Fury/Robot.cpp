@@ -9,7 +9,10 @@ Robot::Robot(sf::Vector2f position, const DIRECTION direction, const float speed
 	this->speed = speed;
 	setPosition(position);
 }
+Robot::Robot()
+{
 
+}
 
 Robot::~Robot()
 {
@@ -65,13 +68,28 @@ void Robot::ActualizeDeplacement(sf::Vector2f destination)
 {
 	movement = destination - getPosition();
 	//Rendu à une certaine distance de la destination, on considère que l'on a atteint notre destination.
-	if (abs(movement.x) > 1 && abs(movement.y) > 1)
+	if (abs(movement.x) > 1 || abs(movement.y) > 1)
 	{
-		float angle = atanf(movement.y / movement.x);
-		
-		//Le abs(movement.x) / movement.x retourne 1 ou -1 tout dépendant de la direction à prendre.
-		movement.x = (abs(movement.x) / movement.x) * speed * cos(angle);
-		movement.y = (abs(movement.x) / movement.x) * speed * sin(angle);
+
+
+		float angle = atanf(abs(movement.y) / abs(movement.x));
+		if (movement.x != 0)
+		{
+			//Le abs(movement.x) / movement.x retourne 1 ou -1 tout dépendant de la direction à prendre.
+			movement.x = (abs(movement.x) / movement.x) * speed * cos(angle);
+		}
+		else
+		{
+			movement.x = speed * cos(angle);
+		}
+		if (movement.y != 0)
+		{
+			movement.y = (abs(movement.y) / movement.y) * speed * sin(angle);
+		}
+		else
+		{
+			movement.y = speed * cos(angle);
+		}
 		FindClosestDir();
 	}
 	else

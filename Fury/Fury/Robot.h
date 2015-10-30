@@ -19,6 +19,7 @@ private:
 
 public:
 	Robot(sf::Vector2f position,const DIRECTION direction, const float speed);
+	Robot();
 	~Robot();
 	bool LoadTexture(const char texturePath[]);
 	void PrepareAnimation(const int nbAnimation, const int nbMovingFramePerDirection);
