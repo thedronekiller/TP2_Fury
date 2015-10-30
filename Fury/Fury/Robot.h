@@ -14,6 +14,9 @@ private:
 	const int WARNING_BOX_OVERLAP = 20;
 	const int ANIM_SPEED = 10;
 	void MoveWarningBox();
+	sf::Vector2f movement;
+	void FindClosestDir();
+
 public:
 	Robot(sf::Vector2f position,const DIRECTION direction, const float speed);
 	~Robot();
