@@ -7,7 +7,7 @@ class Wall:public RectangleShape
 public:
 	Wall(const int x, const int y);
 	~Wall();
-	void InitializeAttachedWall(int x, int y, const DIRECTION dir);
+	void InitializeAttachedWall(int x, int y, const DIRECTION dir, const bool limit);
 	const RectangleShape GetAttachedWall();
 	const IntRect GetRectPivot();
 	const IntRect GetRectWall();

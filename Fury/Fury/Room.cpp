@@ -28,16 +28,16 @@ void Room::InitializeWalls()
 		if (i < 5 || (i>=10 && i<15))
 		{
 			if (i!= 2 && i!=12)
-				pivotsContour[i]->InitializeAttachedWall(x + TAILLE_PIVOT, y, EAST);
+				pivotsContour[i]->InitializeAttachedWall(x + TAILLE_PIVOT, y, EAST, true);
 		}
 		else if (i >= 5 && i < 8)
 		{
-			pivotsContour[i]->InitializeAttachedWall(x, y - 220, NORTH);
+			pivotsContour[i]->InitializeAttachedWall(x, y - 220, NORTH, true);
 			x = LARGEUR - COLONNE_POINTAGE_LARGEUR - TAILLE_PIVOT;
 		}
 		else if (i >= 8 && i < 10)
 		{
-			pivotsContour[i]->InitializeAttachedWall(x, y + TAILLE_PIVOT , SOUTH);
+			pivotsContour[i]->InitializeAttachedWall(x, y + TAILLE_PIVOT , SOUTH, true);
 		}
 
 		if (i == 5 || i==7 || i==9)
@@ -54,7 +54,7 @@ void Room::InitializeWalls()
 			x += 220 + TAILLE_PIVOT;
 		}
 	}
-	x = 220-TAILLE_PIVOT;
+	x = 220+TAILLE_PIVOT;
 	y = 220+TAILLE_PIVOT;
 	int dir = 0;
 	// Initialisation des pivots et murs centraux
@@ -62,19 +62,19 @@ void Room::InitializeWalls()
 	{
 		pivotsCentre[j] = new Wall(x, y);
 		dir = rand() % 8;
-		pivotsCentre[j]->InitializeAttachedWall(x + TAILLE_PIVOT, y, DIRECTION(dir));
+		pivotsCentre[j]->InitializeAttachedWall(x, y, DIRECTION(dir), false);
 		for (int i = 0; i < j; i++)
 		{
 			if (pivotsCentre[j]->GetRectWall().intersects(pivotsCentre[i]->GetRectWall()))
 			{
 				while (pivotsCentre[j]->GetRectWall().intersects(pivotsCentre[i]->GetRectWall()))
 				{
-					pivotsCentre[j]->InitializeAttachedWall(x, y, DIRECTION(rand()%8));
+					pivotsCentre[j]->InitializeAttachedWall(x, y, DIRECTION(rand()%8), false);
 				}
 			}
 		}
 		x += 220 + TAILLE_PIVOT;
-		if (x+TAILLE_PIVOT >= LARGEUR - COLONNE_POINTAGE_LARGEUR - TAILLE_PIVOT)
+		if (x+(TAILLE_PIVOT*2) >= LARGEUR - COLONNE_POINTAGE_LARGEUR - TAILLE_PIVOT)
 		{
 			x = 220+TAILLE_PIVOT;
 			y += 220 + TAILLE_PIVOT;
