@@ -95,3 +95,13 @@ void Room::Draw(RenderWindow* win)
 		win->draw(pivotsContour[j]->GetAttachedWall());
 	}
 }
+
+Wall* Room::GetLimitWalls()
+{
+	return *pivotsContour;
+}
+
+Wall* Room::GetCenterWalls()
+{
+	return *pivotsCentre;
+}
