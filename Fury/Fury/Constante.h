@@ -10,3 +10,4 @@ const int PLAYER_SPEED = 5;
 const int NOMBRE_ANIMATIONS = 8;
 const int NOMBRE_FRAMES_IMMOBILE = 4;
 const int NOMBRE_FRAMES_MOUVEMENT = 8;
+const int NB_ROBOTS = 2;
