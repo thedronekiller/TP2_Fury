@@ -6,6 +6,7 @@ private:
 	sf::Vector2f position;
 	int direction;
 public:
+	Projectile();
 	Projectile(sf::Vector2f position, int direction);
 	~Projectile();
 };

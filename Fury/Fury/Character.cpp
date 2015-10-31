@@ -8,7 +8,8 @@ Character::Character(const float posX, const float posY, const float vitesse, co
 	: speed(vitesse), cadran(cadran), NBR_LEVEL(nbrNiveaux), NBR_ANIMS_STEADY(nbrAnimsImmobile), NBR_ANIMS_MOBILE(nbrAnimsMovement), NBR_ANIMS(nbrAnimsImmobile + nbrAnimsMovement), renderWindow(renderWindow), animator(0), steadyAnimator(0), steadyDirection(1), isMobile(false)
 {
 	setPosition(posX, posY);
-	direction = _NONE;
+	direction = CHAR_DIRECTION(cadran);
+	changeRoom = false;
 }
 
 Character::~Character()
@@ -75,11 +76,6 @@ void Character::AjustementsVisuels()
 	//Le rectangle d'animation initial de notre texture est celui du personnage qui regarde vers le bas
 	setTextureRect(intRectsSteady[cadran][0]);
 
-	//L'origine est toujours le milieu de notre rectangle de texture.
-	//Comme vu ci-haut, c'est la moitié du rectangle d'animation, pas de la texture entière
-	//La première ligne de code peut faire, mais la seconde est mieux.
-	//setOrigin((texture.getSize().x / NBR_ANIMS) / 2, (texture.getSize().y / NBR_MIVEAUX) / 2);
-
 	//Comme tous les rectangles on la même taille, on prend le premier
 	setOrigin(intRectsSteady[0][0].height / 2, intRectsSteady[0][0].width / 2);
 	rectPlayer = IntRect(getPosition().x-20, getPosition().y-25, intRectsSteady[0][0].width/3.5, intRectsSteady[0][0].height/1.6);
@@ -114,8 +110,7 @@ void Character::Deplacement(float axeX, float axeY, Room* room)
 	if (!CheckWallCollisions(room))
 	{
 		//Test pour la traverse des autres côtés de l'écran
-		setPosition(OtherSide(getPosition().x, renderWindow->getSize().x, (texture.getSize().x / NBR_ANIMS) / 2), 
-			OtherSide(getPosition().y, renderWindow->getSize().y, (texture.getSize().y / NBR_LEVEL) / 2));
+		OtherSide(renderWindow->getSize().x, renderWindow->getSize().y, (texture.getSize().x / NBR_ANIMS) / 2);
 		//Si on est mobile on joue les animations de course
 		if (isMobile)
 		{
@@ -129,7 +124,6 @@ void Character::Deplacement(float axeX, float axeY, Room* room)
 		}
 		else //Si on est immobile
 		{
-			//Idle(direction);
 			//On change de frame à chaque "temps d'animation"
 			if (animator++ % SPEED_ANIMATION == 0)
 			{
@@ -161,17 +155,37 @@ void Character::Deplacement(float axeX, float axeY, Room* room)
 /// <param name="tailleEcran">La taille de l'écran pour cet axe.</param>
 /// <param name="demiTailleVaisseau">La taille de la moitié du vaisseau, du centre à son extrémité.</param>
 /// <returns></returns>
-float Character::OtherSide(float positionDansAxe, const int tailleEcran, const int demiTaillePersonnage)
+void Character::OtherSide(const int screenWidth,const int screenHeight, const int demiTaillePersonnage)
 {
-	if (positionDansAxe > tailleEcran + demiTaillePersonnage)
+	changeRoom = false;
+	//EN BAS
+	if (getPosition().y > screenHeight + demiTaillePersonnage)
 	{
-		positionDansAxe -= tailleEcran + demiTaillePersonnage * 2;
+		changeRoom = true;
+		setPosition(getPosition().x, demiTaillePersonnage/2);
 	}
-	else if (positionDansAxe < -demiTaillePersonnage)
+	// EN HAUT
+	else if (getPosition().y < 0 - demiTaillePersonnage)
 	{
-		positionDansAxe += tailleEcran + demiTaillePersonnage * 2;
+		changeRoom = true;
+		setPosition(getPosition().x, screenHeight - demiTaillePersonnage);
 	}
-	return positionDansAxe;
+	// À GAUCHE
+	else if (getPosition().x < -demiTaillePersonnage)
+	{
+		changeRoom = true;
+		setPosition(screenWidth - demiTaillePersonnage * 2 - COLONNE_POINTAGE_LARGEUR, getPosition().y);		
+	}
+	// À DROITE
+	else if (getPosition().x > screenWidth)
+	{
+		changeRoom = true;
+		setPosition(0, getPosition().y);
+	}
+	if (changeRoom)
+		isMobile = false;
+	rectPlayer.left = getPosition().x;
+	rectPlayer.top = getPosition().y;
 }
 
 const bool Character::CheckWallCollisions(Room* room)
@@ -205,4 +219,26 @@ void Character::SetDirection(const CHAR_DIRECTION direction)
 	this->direction = direction;
 	if (direction == _NONE)
 		isMobile = false;
+}
+
+const bool Character::ChangedRoom()
+{
+	return changeRoom;
+}
+
+void Character::SetChangedRoom(const bool changed)
+{
+	changeRoom = changed;
+}
+
+void Character::Fire()
+{
+	for (int i = 0; i < MAX_AMMO; i++)
+	{
+		//if (projectiles[i])
+		{
+			projectiles[i] = Projectile(getPosition(), cadran);
+			break;
+		}
+	}
 }

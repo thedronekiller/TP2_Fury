@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Wall.h"
 #include "Room.h"
+#include "Projectile.h"
 
 using namespace sf;
 
@@ -35,11 +36,12 @@ using namespace sf;
 
 		IntRect rectPlayer;
 		CHAR_DIRECTION direction;
-
+		Projectile projectiles[2];
 
 		//Méthode récupéré gratis de même dans le corrigé d'Asteroid.   Si ça marche, pourquoi le refaire?
-		float OtherSide(float positionDansAxe, const int tailleEcran, const int demiTailleVaisseau);
+		void OtherSide(const int screenWidth, const int screenHeight, const int demiTailleVaisseau);
 		const bool CheckWallCollisions(Room* room);
+		bool changeRoom;
 
 	public:
 		//Constructeur avec tous les attributs plus haut.  Utiliser un tableau de char pour le path évite d'inclure string et un string a un constructeur avec un tableau de char
@@ -51,6 +53,9 @@ using namespace sf;
 		void AjustementsDuCadrant(int cadrant); //On détermine quel cadrant on fait face.
 		void Deplacement(float axeX, float axeY, Room* room);
 		void SetDirection(const CHAR_DIRECTION direction);
+		const bool ChangedRoom();
+		void SetChangedRoom(const bool changed);
+		void Fire();
 	};
 
 
