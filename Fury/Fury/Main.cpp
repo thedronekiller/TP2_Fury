@@ -47,14 +47,12 @@ bool Init()
 	}
 	player = new Character(LARGEUR / 2, 100.0f, PLAYER_SPEED, 6, NOMBRE_ANIMATIONS, NOMBRE_FRAMES_IMMOBILE, NOMBRE_FRAMES_MOUVEMENT, &mainWin);
 	player->AjustementsVisuels();
-	robots[0] = new Robot(Vector2f(100, 100), DIRECTION::SOUTH, 0.0f);
+	robots[0] = new Robot(Vector2f(100, 100), DIRECTION::SOUTH, 1.0f);
 	if (!robots[0]->LoadTexture("Sprites\\Robot.png"))
 	{
 		return false;
 	}
 	robots[0]->PrepareAnimation(8, 4);
-	robots[1] = new Robot(Vector2f(1000, 600), DIRECTION::SOUTH, 1.0f);
-	robots[1]->PrepareAnimation(8, 4);
 	//interface de déplacement à 0/0
 	interfaceDeplacement.x = 0;
 	interfaceDeplacement.y = 0;
@@ -78,23 +76,8 @@ void Update()
 {
 
 	//player->Deplacement(interfaceDeplacement.x, interfaceDeplacement.y, room.GetLimitWalls(),16, room.GetCenterWalls(), 8);
-	for (int i = 0; i < NB_ROBOTS; i++)
-	{
-		robots[i]->ActualizeDeplacement(sf::Vector2f(1000,800), room.GetLimitWalls());
-		bool canMove = true;
-		for (int j = 0; j < NB_ROBOTS; j++)
-		{
-			if (i != j && robots[i]->CheckRobotCollision(*robots[j]))
-			{
-				canMove = false;
-				break;
-			}
-		}
-		if (canMove)
-		{
-			robots[i]->Deplacement();
-		}
-	}
+	robots[0]->ActualizeDeplacement(Vector2f(player->getPosition()));
+	robots[0]->Deplacement();
 }
 
 void Draw()
@@ -102,10 +85,7 @@ void Draw()
 	mainWin.clear();
 	room.Draw(&mainWin);
 	mainWin.draw(*player);
-	for (int i = 0; i < NB_ROBOTS; i++)
-	{
-		mainWin.draw(*robots[i]);
-	}
+	mainWin.draw(*robots[0]);
 	mainWin.display();
 }
 
