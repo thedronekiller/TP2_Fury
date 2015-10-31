@@ -4,13 +4,15 @@
 #include <SFML/Graphics.hpp>
 #include "Room.h"
 #include "Character.h"
+#include "Robot.h"
 
 using namespace sf;
 RenderWindow mainWin(VideoMode(LARGEUR, HAUTEUR, 32), "Fury");
 View view(mainWin.getDefaultView());
 Event event;
-Room* room;
+Room room;
 Character* player;
+Robot* robots[2];
 Vector2f interfaceDeplacement; //Vecteur de déplacement du personnage
 const float DIAGONALE = cos(M_PI_4);  //diagonale qui détermine une pure diagonale de pente 1
 
@@ -35,7 +37,6 @@ int main()
 		Draw();
 	}
 	delete player;
-	delete room;
 	return EXIT_SUCCESS;
 }
 bool Init()
@@ -44,10 +45,14 @@ bool Init()
 	{
 		return false;
 	}
-	room = new Room();
 	player = new Character(LARGEUR / 2, 100.0f, PLAYER_SPEED, 6, NOMBRE_ANIMATIONS, NOMBRE_FRAMES_IMMOBILE, NOMBRE_FRAMES_MOUVEMENT, &mainWin);
 	player->AjustementsVisuels();
-	IntRect r = room->GetLimitWalls(11);
+	robots[0] = new Robot(Vector2f(100, 100), DIRECTION::SOUTH, 1.0f);
+	if (!robots[0]->LoadTexture("Sprites\\Robot.png"))
+	{
+		return false;
+	}
+	robots[0]->PrepareAnimation(8, 4);
 	//interface de déplacement à 0/0
 	interfaceDeplacement.x = 0;
 	interfaceDeplacement.y = 0;
@@ -69,14 +74,18 @@ void GetInputs()
 
 void Update()
 {
-	player->Deplacement(interfaceDeplacement.x, interfaceDeplacement.y, room);
+
+	//player->Deplacement(interfaceDeplacement.x, interfaceDeplacement.y, room.GetLimitWalls(),16, room.GetCenterWalls(), 8);
+	robots[0]->ActualizeDeplacement(Vector2f(player->getPosition()));
+	robots[0]->Deplacement();
 }
 
 void Draw()
 {
 	mainWin.clear();
-	room->Draw(&mainWin);
+	room.Draw(&mainWin);
 	mainWin.draw(*player);
+	mainWin.draw(*robots[0]);
 	mainWin.display();
 }
 
@@ -92,21 +101,18 @@ void KeyboardMovement()
 			interfaceDeplacement.x = -DIAGONALE;
 			interfaceDeplacement.y = -DIAGONALE;
 			player->AjustementsDuCadrant(NORTH_WEST);
-			player->SetDirection(NORTH_WEST);
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::Down))
 		{
 			interfaceDeplacement.x = -DIAGONALE;
 			interfaceDeplacement.y = DIAGONALE;
 			player->AjustementsDuCadrant(SOUTH_WEST);
-			player->SetDirection(SOUTH_WEST);
 		}
 		else
 		{
 			interfaceDeplacement.x = -1;
 			interfaceDeplacement.y = 0;
 			player->AjustementsDuCadrant(WEST);
-			player->SetDirection(WEST);
 		}
 	}
 	else if (Keyboard::isKeyPressed(Keyboard::Right))
@@ -116,21 +122,18 @@ void KeyboardMovement()
 			interfaceDeplacement.x = DIAGONALE;
 			interfaceDeplacement.y = -DIAGONALE;
 			player->AjustementsDuCadrant(NORTH_EAST);
-			player->SetDirection(NORTH_EAST);
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::Down))
 		{
 			interfaceDeplacement.x = DIAGONALE;
 			interfaceDeplacement.y = DIAGONALE;
 			player->AjustementsDuCadrant(SOUTH_EAST);
-			player->SetDirection(SOUTH_EAST);
 		}
 		else
 		{
 			interfaceDeplacement.x = 1;
 			interfaceDeplacement.y = 0;
 			player->AjustementsDuCadrant(EAST);
-			player->SetDirection(EAST);
 		}
 	}
 	else
@@ -140,20 +143,18 @@ void KeyboardMovement()
 			interfaceDeplacement.x = 0;
 			interfaceDeplacement.y = -1;
 			player->AjustementsDuCadrant(NORTH);
-			player->SetDirection(NORTH);
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::Down))
 		{
 			interfaceDeplacement.x = 0;
 			interfaceDeplacement.y = 1;
 			player->AjustementsDuCadrant(SOUTH);
-			player->SetDirection(SOUTH);
 		}
 		else
 		{
 			interfaceDeplacement.x = 0;
 			interfaceDeplacement.y = 0;
-			player->SetDirection(NONE);
+			player->AjustementsDuCadrant(NONE);
 		}
 	}
 }

@@ -52,16 +52,42 @@ void Robot::PrepareAnimation(const int nbAnimation, const int nbMovingFramePerDi
 	setTextureRect(movingAnimation[dir][0]);
 	setOrigin(movingAnimation[0][0].height / 2, movingAnimation[0][0].width / 2);
 	MoveWarningBox();
+
 		
+}
+bool Robot::CheckWallCollisionWithWarning(Wall& wall)
+{
+	bool isColliding = false;
+	//int a = wall.GetAttachedWall().getPosition().x;
+	//int b = wall.GetAttachedWall().getPosition().y;
+	//sf::IntRect wallRect(wall.getPosition().x, wall.getPosition().y,wall.getSize().x, wall.getSize().y);
+	sf::IntRect rect(wall.GetRectWall());
+	if (wall.GetRectWall().intersects(warningBox))
+	{
+		isColliding = true;
+	}
+
+	return isColliding;
+}
+bool Robot::CheckRobotCollision(const Robot& otherRobot)
+{
+	bool isColliding = false;
+	if (warningBox.intersects(otherRobot.warningBox))
+	{
+	
+
+		isColliding = true;
+	}
+	return isColliding;
 }
 void Robot::MoveWarningBox()
 {
-	warningBox.left = getPosition().x - WARNING_BOX_OVERLAP;
-	warningBox.top = getPosition().y - WARNING_BOX_OVERLAP;
-	warningBox.height = movingAnimation[0][0].height + WARNING_BOX_OVERLAP * 2;
-	warningBox.width = movingAnimation[0][0].width + WARNING_BOX_OVERLAP * 2;
+	warningBox.left = getPosition().x;
+	warningBox.top = getPosition().y;
+	warningBox.height = movingAnimation[0][0].height;
+	warningBox.width = movingAnimation[0][0].width;
 }
-void Robot::ActualizeDeplacement(sf::Vector2f destination)
+void Robot::ActualizeDeplacement(sf::Vector2f destination, Wall* walls)
 {
 	movement = destination - getPosition();
 	//Rendu à une certaine distance de la destination, on considère que l'on a atteint notre destination.
@@ -73,6 +99,10 @@ void Robot::ActualizeDeplacement(sf::Vector2f destination)
 		movement.x = (abs(movement.x) / movement.x) * speed * cos(angle);
 		movement.y = (abs(movement.x) / movement.x) * speed * sin(angle);
 		FindClosestDir();
+		for (int i = 0; i < NB_PIVOTS_CENTRE; i++)
+		{
+			CheckWallCollisionWithWarning(walls[i]);
+		}
 	}
 	else
 	{
@@ -119,7 +149,6 @@ void Robot::FindClosestDir()
 }
 void Robot::Deplacement()
 {
-
 
 	move(movement);
 	MoveWarningBox();
