@@ -43,6 +43,10 @@ void Wall::InitializeAttachedWall(int x, int y, const DIRECTION dir, const bool 
 		if(limit==false)
 			x -= 220;
 	}
+	else
+	{
+		attachedWall.setSize(Vector2f(0, 0));
+	}
 	attachedWall.setPosition(Vector2f(x, y));
 	attachedWall.setFillColor(Color::Green);
 	rectAttachedWall = IntRect(x, y, attachedWall.getSize().x, attachedWall.getSize().y);

@@ -1,5 +1,5 @@
 #include "Character.h"
-
+#include <iostream>
 
 
 Texture	Character::texture; //Initialisation de notre texture (appel du constructeur par dfaut)
@@ -8,6 +8,7 @@ Character::Character(const float posX, const float posY, const float vitesse, co
 	: speed(vitesse), cadran(cadran), NBR_LEVEL(nbrNiveaux), NBR_ANIMS_STEADY(nbrAnimsImmobile), NBR_ANIMS_MOBILE(nbrAnimsMovement), NBR_ANIMS(nbrAnimsImmobile + nbrAnimsMovement), renderWindow(renderWindow), animator(0), steadyAnimator(0), steadyDirection(1), isMobile(false)
 {
 	setPosition(posX, posY);
+	direction = NONE;
 }
 
 Character::~Character()
@@ -81,7 +82,7 @@ void Character::AjustementsVisuels()
 
 	//Comme tous les rectangles on la même taille, on prend le premier
 	setOrigin(intRectsSteady[0][0].height / 2, intRectsSteady[0][0].width / 2);
-	rectPlayer = IntRect(getPosition().x, getPosition().y, intRectsSteady[0][0].width, intRectsSteady[0][0].height);
+	rectPlayer = IntRect(getPosition().x-20, getPosition().y-25, intRectsSteady[0][0].width/3.5, intRectsSteady[0][0].height/1.6);
 }
 
 void Character::AjustementsDuCadrant(int cadran)
@@ -104,47 +105,52 @@ void Character::AjustementsDuCadrant(int cadran)
 	}
 }
 
-void Character::Deplacement(float axeX, float axeY, Wall* limitWalls[], const int nbLimitPivots, Wall* centerWalls[], const int nbCenterPivots)
+void Character::Deplacement(float axeX, float axeY, Room* room)
 {
-	if (!CheckWallCollisions(limitWalls, nbLimitPivots, centerWalls, nbCenterPivots))
+	//Déplacement du personnage
+	move(axeX * speed, axeY * speed);
+	rectPlayer.left = getPosition().x - 20;
+	rectPlayer.top = getPosition().y - 25;
+	if (!CheckWallCollisions(room))
 	{
-		//Déplacement du personnage
-		move(axeX * speed, axeY * speed);
-		rectPlayer.left = getPosition().x;
-		rectPlayer.top = getPosition().y;
-
 		//Test pour la traverse des autres côtés de l'écran
 		setPosition(OtherSide(getPosition().x, renderWindow->getSize().x, (texture.getSize().x / NBR_ANIMS) / 2), 
 			OtherSide(getPosition().y, renderWindow->getSize().y, (texture.getSize().y / NBR_LEVEL) / 2));
-	}
-
-
-	//Si on est mobile on joue les animations de course
-	if (isMobile)
-	{
-		//On change de frame à chaque "temps d'animation"
-		if (animator++ % SPEED_ANIMATION == 0)
+		//Si on est mobile on joue les animations de course
+		if (isMobile)
 		{
-			//La division fait en sorte que la gauche du modulo est +1 de la fois précédente
-			//Modulo le nombre d'animations de mouvement
-			setTextureRect(intRectsMobile[cadran][(animator / SPEED_ANIMATION) % NBR_ANIMS_MOBILE]);
-		}
-	}
-	else //Si on est immobile
-	{
-		//On change de frame à chaque "temps d'animation"
-		if (animator++ % SPEED_ANIMATION == 0)
-		{
-			//Ici le principe est que l'animation fonctionne par frame 0-1-2-3-2-1-0-1......
-			setTextureRect(intRectsSteady[cadran][steadyAnimator]);
-			steadyAnimator += steadyDirection;
-
-			if (steadyAnimator == 0 || steadyAnimator == (NBR_ANIMS_STEADY - 1))
+			//On change de frame à chaque "temps d'animation"
+			if (animator++ % SPEED_ANIMATION == 0)
 			{
-				steadyDirection *= -1;
+				//La division fait en sorte que la gauche du modulo est +1 de la fois précédente
+				//Modulo le nombre d'animations de mouvement
+				setTextureRect(intRectsMobile[cadran][(animator / SPEED_ANIMATION) % NBR_ANIMS_MOBILE]);
+			}
+		}
+		else //Si on est immobile
+		{
+			//Idle(direction);
+			//On change de frame à chaque "temps d'animation"
+			if (animator++ % SPEED_ANIMATION == 0)
+			{
+				//Ici le principe est que l'animation fonctionne par frame 0-1-2-3-2-1-0-1......
+				setTextureRect(intRectsSteady[cadran][steadyAnimator]);
+				steadyAnimator += steadyDirection;
+
+				if (steadyAnimator == 0 || steadyAnimator == (NBR_ANIMS_STEADY - 1))
+				{
+					steadyDirection *= -1;
+				}
 			}
 		}
 	}
+	else
+	{
+		move(axeX * -speed, axeY * -speed);
+		rectPlayer.left = getPosition().x - 20;
+		rectPlayer.top = getPosition().y - 25;
+	}
+
 }
 
 /// <summary>
@@ -168,29 +174,35 @@ float Character::OtherSide(float positionDansAxe, const int tailleEcran, const i
 	return positionDansAxe;
 }
 
-const bool Character::CheckWallCollisions(Wall* limitWalls[], const int nbLimitPivots, Wall* centerWalls[], const int nbCenterPivots)
+const bool Character::CheckWallCollisions(Room* room)
 {
-	for (int i = 0; i < nbLimitPivots; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		if (limitWalls[i]->GetRectPivot().intersects(rectPlayer) || limitWalls[i]->GetRectWall().intersects(rectPlayer))
+		if (room->GetLimitPivots(i).intersects(rectPlayer) || room->GetLimitWalls(i).intersects(rectPlayer))
 		{
 			isMobile = false;
-			cadran = 8;
+			cadran = 0;
 			return true;
 		}
 	}
 	if (isMobile)
 	{
-		for (int j = 0; j < nbCenterPivots; j++)
+		for (int j = 0; j < 8; j++)
 		{
-			if (centerWalls[j]->GetRectPivot().intersects(rectPlayer) || centerWalls[j]->GetRectWall().intersects(rectPlayer))
+			if (room->GetCenterPivots(j).intersects(rectPlayer) || room->GetCenterWalls(j).intersects(rectPlayer))
 			{
 				isMobile = false;
-				cadran = 8;
+				cadran = 0;
 				return true;
 			}
 		}
 	}
-
 	return false;
+}
+
+void Character::SetDirection(const DIRECTION direction) 
+{
+	this->direction = direction;
+	if (direction == NONE)
+		isMobile = false;
 }

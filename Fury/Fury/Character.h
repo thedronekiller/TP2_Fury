@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Wall.h"
+#include "Room.h"
 
 using namespace sf;
 
@@ -33,24 +34,23 @@ using namespace sf;
 		const int NBR_ANIMS;  //Nombre de frame d'animation au total dans la spriteSheet.
 
 		IntRect rectPlayer;
-
+		DIRECTION direction;
 
 
 		//Méthode récupéré gratis de même dans le corrigé d'Asteroid.   Si ça marche, pourquoi le refaire?
 		float OtherSide(float positionDansAxe, const int tailleEcran, const int demiTailleVaisseau);
-
-		const bool CheckWallCollisions(Wall* limitWalls[], const int nbLimitPivots, Wall* centerWalls[], const int nbCenterPivots);
+		const bool CheckWallCollisions(Room* room);
 
 	public:
 		//Constructeur avec tous les attributs plus haut.  Utiliser un tableau de char pour le path évite d'inclure string et un string a un constructeur avec un tableau de char
 		Character(const float posX, const float posY, const float speed, const int cadran, const int nbrNiveaux, const int nbrAnimsIdle, const int nbrAnimsMovement, RenderWindow* const renderWindow);
 		~Character();
-
 		static bool ChargerTextures(const char texturePath[]);
 		void AjustementsVisuels(); //Méthode de "finalisation du constructeur"
 
 		void AjustementsDuCadrant(int cadrant); //On détermine quel cadrant on fait face.
-		void Deplacement(float axeX, float axeY,Wall* limitWalls[], const int nbLimitPivots, Wall* centerWalls[], const int nbCenterPivots);
+		void Deplacement(float axeX, float axeY, Room* room);
+		void SetDirection(const DIRECTION direction);
 	};
 
 

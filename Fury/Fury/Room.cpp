@@ -22,6 +22,24 @@ void Room::InitializeWalls()
 	int x = 0;
 	int y = 0;
 	int row = 1;
+	/*pivotsContour[0] = new Wall(x, y);
+	pivotsContour[1] = new Wall(x, y);
+	pivotsContour[2] = new Wall(x, y);
+	pivotsContour[3] = new Wall(x, y);
+	pivotsContour[4] = new Wall(x, y);
+	pivotsContour[5] = new Wall(x, y);
+	pivotsContour[6] = new Wall(x, y);
+	pivotsContour[7] = new Wall(x, y);
+	pivotsContour[8] = new Wall(x, y);
+	pivotsContour[9] = new Wall(x, y);
+	pivotsContour[10] = new Wall(x, y);
+	pivotsContour[11] = new Wall(x, y);
+	pivotsContour[12] = new Wall(x, y);
+	pivotsContour[13] = new Wall(x, y);
+	pivotsContour[14] = new Wall(x, y);
+	pivotsContour[15] = new Wall(x, y);*/
+	//8,10,11,13,14
+	
 	for (int i = 0; i < NB_PIVOTS_CONTOUR; i++)
 	{
 		pivotsContour[i] = new Wall(x, y);
@@ -32,7 +50,10 @@ void Room::InitializeWalls()
 		}
 		else if (i >= 5 && i < 8)
 		{
-			pivotsContour[i]->InitializeAttachedWall(x, y - 220, NORTH, true);
+			if (i!=6)
+				pivotsContour[i]->InitializeAttachedWall(x, y+TAILLE_PIVOT, NORTH, true);
+			else
+				pivotsContour[i]->InitializeAttachedWall(x, y-220, NORTH, true);
 			x = LARGEUR - COLONNE_POINTAGE_LARGEUR - TAILLE_PIVOT;
 		}
 		else if (i >= 8 && i < 10)
@@ -54,6 +75,17 @@ void Room::InitializeWalls()
 			x += 220 + TAILLE_PIVOT;
 		}
 	}
+	// On set les "murs" des portes à une valeur par défaut
+	pivotsContour[2]->InitializeAttachedWall(x, y + TAILLE_PIVOT, NONE, true);
+	//pivotsContour[6]->InitializeAttachedWall(x, y + TAILLE_PIVOT, NONE, true);
+	pivotsContour[7]->InitializeAttachedWall(x, y + TAILLE_PIVOT, NONE, true);
+	//pivotsContour[8]->InitializeAttachedWall(0, 485, SOUTH, true);
+	//pivotsContour[10]->InitializeAttachedWall(15, 705, EAST, true);
+	//pivotsContour[11]->InitializeAttachedWall(205, 705, EAST, true);
+	pivotsContour[12]->InitializeAttachedWall(x, y + TAILLE_PIVOT, NONE, true);
+	//pivotsContour[13]->InitializeAttachedWall(720, 705, EAST, true);
+	//pivotsContour[14]->InitializeAttachedWall(955, 705, EAST, true);
+
 	x = 220+TAILLE_PIVOT;
 	y = 220+TAILLE_PIVOT;
 	int dir = 0;
@@ -96,12 +128,29 @@ void Room::Draw(RenderWindow* win)
 	}
 }
 
-Wall* Room::GetLimitWalls()
+const IntRect Room::GetLimitWalls(const int index)
 {
-	return *pivotsContour;
+	return pivotsContour[index]->GetRectWall();
 }
 
-Wall* Room::GetCenterWalls()
+const IntRect Room::GetCenterWalls(const int index)
 {
-	return *pivotsCentre;
+	return pivotsCentre[index]->GetRectWall();
+}
+
+const IntRect Room::GetLimitPivots(const int index)
+{
+	return pivotsContour[index]->GetRectPivot();
+}
+const IntRect Room::GetCenterPivots(const int index)
+{
+	return pivotsCentre[index]->GetRectPivot();
+}
+Wall** Room::GetAllLimitPivots()
+{
+	return pivotsContour;
+}
+Wall** Room::GetAllCenterPivots()
+{
+	return pivotsCentre;
 }
