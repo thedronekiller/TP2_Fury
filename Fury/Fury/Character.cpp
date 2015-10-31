@@ -8,7 +8,7 @@ Character::Character(const float posX, const float posY, const float vitesse, co
 	: speed(vitesse), cadran(cadran), NBR_LEVEL(nbrNiveaux), NBR_ANIMS_STEADY(nbrAnimsImmobile), NBR_ANIMS_MOBILE(nbrAnimsMovement), NBR_ANIMS(nbrAnimsImmobile + nbrAnimsMovement), renderWindow(renderWindow), animator(0), steadyAnimator(0), steadyDirection(1), isMobile(false)
 {
 	setPosition(posX, posY);
-	direction = NONE;
+	direction = _NONE;
 }
 
 Character::~Character()
@@ -200,9 +200,9 @@ const bool Character::CheckWallCollisions(Room* room)
 	return false;
 }
 
-void Character::SetDirection(const DIRECTION direction) 
+void Character::SetDirection(const CHAR_DIRECTION direction) 
 {
 	this->direction = direction;
-	if (direction == NONE)
+	if (direction == _NONE)
 		isMobile = false;
 }

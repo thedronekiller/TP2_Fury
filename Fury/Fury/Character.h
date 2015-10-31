@@ -34,7 +34,7 @@ using namespace sf;
 		const int NBR_ANIMS;  //Nombre de frame d'animation au total dans la spriteSheet.
 
 		IntRect rectPlayer;
-		DIRECTION direction;
+		CHAR_DIRECTION direction;
 
 
 		//Méthode récupéré gratis de même dans le corrigé d'Asteroid.   Si ça marche, pourquoi le refaire?
@@ -50,7 +50,7 @@ using namespace sf;
 
 		void AjustementsDuCadrant(int cadrant); //On détermine quel cadrant on fait face.
 		void Deplacement(float axeX, float axeY, Room* room);
-		void SetDirection(const DIRECTION direction);
+		void SetDirection(const CHAR_DIRECTION direction);
 	};
 
 
